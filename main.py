@@ -1,15 +1,16 @@
 import os
 import asyncio
+import json
+import signal
+import binascii
+
 from dotenv import load_dotenv
 from telegram import Update, BotCommand
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-import requests
-import nest_asyncio
 from cryptography.fernet import Fernet
-import signal
-import json
 from ecdsa import SigningKey, SECP256k1
-import binascii
+import aiohttp
+import nest_asyncio
 
 # Allow nested event loops
 nest_asyncio.apply()
@@ -44,43 +45,45 @@ async def check_balance(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         return
     address = context.args[0]
     try:
-        response = requests.get(f'https://api.blockcypher.com/v1/btc/main/addrs/{address}/balance?token={blockcypher_token}')
-        response.raise_for_status()
-        data = response.json()
-        balance = data.get('balance', 0)
-        await update.message.reply_text(f"Your balance: {balance} satoshis")
-    except requests.exceptions.RequestException as e:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f'https://api.blockcypher.com/v1/btc/main/addrs/{address}/balance?token={blockcypher_token}') as response:
+                response.raise_for_status()
+                data = await response.json()
+                balance = data.get('balance', 0)
+                await update.message.reply_text(f"Your balance: {balance} satoshis")
+    except aiohttp.ClientError as e:
         await update.message.reply_text("Error retrieving balance.")
         print(f"Error: {e}")
 
 # Function to generate a new address
 async def generate_address(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     try:
-        response = requests.post(f'https://api.blockcypher.com/v1/btc/main/addrs?token={blockcypher_token}')
-        response.raise_for_status()
-        data = response.json()
-        address = data.get('address')
-        private_key = data.get('private')
-        encrypted_private_key = encrypt_private_key(private_key)
-        
-        # Load existing keys from file
-        try:
-            with open("keys.json", "r") as file:
-                keys = json.load(file)
-        except (FileNotFoundError, json.JSONDecodeError):
-            keys = []
+        async with aiohttp.ClientSession() as session:
+            async with session.post(f'https://api.blockcypher.com/v1/btc/main/addrs?token={blockcypher_token}') as response:
+                response.raise_for_status()
+                data = await response.json()
+                address = data.get('address')
+                private_key = data.get('private')
+                encrypted_private_key = encrypt_private_key(private_key)
+                
+                # Load existing keys from file
+                try:
+                    with open("keys.json", "r") as file:
+                        keys = json.load(file)
+                except (FileNotFoundError, json.JSONDecodeError):
+                    keys = []
 
-        # Add new key
-        keys.append({address: encrypted_private_key})
+                # Add new key
+                keys.append({address: encrypted_private_key})
 
-        # Save updated keys to file
-        with open("keys.json", "w") as file:
-            json.dump(keys, file, indent=4)
+                # Save updated keys to file
+                with open("keys.json", "w") as file:
+                    json.dump(keys, file, indent=4)
 
-        await update.message.reply_text(f"Your new address: {address}")
-        print(f"Saved encrypted key for {address}: {encrypted_private_key}")
+                await update.message.reply_text(f"Your new address: {address}")
+                print(f"Saved encrypted key for {address}: {encrypted_private_key}")
 
-    except requests.exceptions.RequestException as e:
+    except aiohttp.ClientError as e:
         await update.message.reply_text("Error creating address.")
         print(f"Error: {e}")
 
@@ -95,7 +98,11 @@ async def send_crypto(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     try:
         with open("keys.json", "r") as file:
             keys = json.load(file)
-        encrypted_private_key = next((item[from_address] for item in keys if from_address in item), None)
+        encrypted_private_key = None
+        for item in keys:
+            if from_address in item:
+                encrypted_private_key = item[from_address]
+                break
 
         if not encrypted_private_key:
             await update.message.reply_text("Error: Private key for this address not found.")
@@ -104,35 +111,36 @@ async def send_crypto(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         private_key = decrypt_private_key(encrypted_private_key)
         
         # Create an unsigned transaction
-        response = requests.post(f'https://api.blockcypher.com/v1/btc/main/txs/new?token={blockcypher_token}', json={
-            "inputs": [{"addresses": [from_address]}],
-            "outputs": [{"addresses": [to_address], "value": amount}]
-        })
-        response.raise_for_status()
-        tx_data = response.json()
+        async with aiohttp.ClientSession() as session:
+            async with session.post(f'https://api.blockcypher.com/v1/btc/main/txs/new?token={blockcypher_token}', json={
+                "inputs": [{"addresses": [from_address]}],
+                "outputs": [{"addresses": [to_address], "value": amount}]
+            }) as response:
+                response.raise_for_status()
+                tx_data = await response.json()
 
-        if "errors" in tx_data:
-            await update.message.reply_text("Error creating transaction.")
-            return
+                if "errors" in tx_data:
+                    await update.message.reply_text("Error creating transaction.")
+                    return
 
-        # Sign the transaction
-        sk = SigningKey.from_string(binascii.unhexlify(private_key), curve=SECP256k1)
-        tosign = tx_data["tosign"]
-        signatures = [binascii.hexlify(sk.sign(binascii.unhexlify(t))).decode() for t in tosign]
-        tx_data["signatures"] = signatures
-        tx_data["pubkeys"] = [sk.verifying_key.to_string("compressed").hex()]
+                # Sign the transaction
+                sk = SigningKey.from_string(binascii.unhexlify(private_key), curve=SECP256k1)
+                tosign = tx_data["tosign"]
+                signatures = [binascii.hexlify(sk.sign(binascii.unhexlify(t))).decode() for t in tosign]
+                tx_data["signatures"] = signatures
+                tx_data["pubkeys"] = [sk.verifying_key.to_string("compressed").hex()]
 
-        # Send the signed transaction
-        send_response = requests.post(f'https://api.blockcypher.com/v1/btc/main/txs/send?token={blockcypher_token}', json=tx_data)
-        send_response.raise_for_status()
-        send_data = send_response.json()
+                # Send the signed transaction
+                async with session.post(f'https://api.blockcypher.com/v1/btc/main/txs/send?token={blockcypher_token}', json=tx_data) as send_response:
+                    send_response.raise_for_status()
+                    send_data = await send_response.json()
 
-        if "errors" in send_data:
-            await update.message.reply_text("Error sending transaction.")
-        else:
-            await update.message.reply_text(f"Transaction sent: {send_data.get('tx', {}).get('hash')}")
+                    if "errors" in send_data:
+                        await update.message.reply_text("Error sending transaction.")
+                    else:
+                        await update.message.reply_text(f"Transaction sent: {send_data.get('tx', {}).get('hash')}")
 
-    except requests.exceptions.RequestException as e:
+    except aiohttp.ClientError as e:
         await update.message.reply_text("Error sending transaction.")
         print(f"Error: {e}")
 

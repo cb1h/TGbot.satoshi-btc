@@ -3,9 +3,9 @@
 Bot uses API from blockcypher.com  
 Docs: https://www.blockcypher.com/dev/#introduction
 
-U will need Token from blockcypher.com (just register, thats free)
-U will need Token from your TG Bot (use BotFather for create bots)
-U will need to create encryption_key. Use file create_key.py for creating this key.
+You will need a token from blockcypher.com (just register, it's free).
+You will need a token from your Telegram Bot (use BotFather to create bots).
+You will need to create an encryption key. Use the file `create_key.py` to create this key.
 
 This is a Telegram bot for managing Bitcoin transactions. The bot allows users to generate new Bitcoin addresses, check balances, and send cryptocurrency.
 
@@ -21,7 +21,7 @@ This is a Telegram bot for managing Bitcoin transactions. The bot allows users t
 - Python 3.7+
 - `python-telegram-bot`
 - `python-dotenv`
-- `requests`
+- `aiohttp`
 - `cryptography`
 - `ecdsa`
 - `nest_asyncio`
