@@ -31,4 +31,4 @@ jobs:
         ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
         PYTHONPATH: ${{ github.workspace }}
       run: |
-        pytest tests/ --disable-warnings
+        pytest tests/ --disable-warnings -rA
