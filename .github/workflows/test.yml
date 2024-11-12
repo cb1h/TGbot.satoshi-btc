@@ -27,7 +27,7 @@ jobs:
     - name: Run tests
       env:
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        BLOCKCYPHER_TOKEN: ${{ secrets.BLOCKCYPHER_TOKEN }}
+        BLOCKCYPHER_API_TOKEN: ${{ secrets.BLOCKCYPHER_API_TOKEN }}
         ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
         PYTHONPATH: ${{ github.workspace }}
       run: |
