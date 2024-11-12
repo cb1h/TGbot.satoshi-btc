@@ -1,0 +1,36 @@
+test_bot.py
+1.
+Description: Tests the /start command.
+Checks: Ensures the bot replies with a welcome message.
+Conclusion: Confirms the bot responds correctly to the /start command.
+test_check_balance_command
+2.
+Description: Tests the /balance command.
+Checks: Ensures the bot replies with the balance information.
+Conclusion: Confirms the bot can retrieve and display balance information.
+test_generate_address_command
+3.
+Description: Tests the /generate_address command.
+Checks: Ensures the bot replies with a new address.
+Conclusion: Confirms the bot can generate and display a new address.
+test_send_crypto_command
+4.
+Description: Tests the /send command.
+Checks: Ensures the bot replies with transaction information.
+Conclusion: Confirms the bot can send cryptocurrency and display transaction details.
+
+test_encryption.py
+1.
+Description: Tests the encrypt_private_key function.
+Checks: Ensures the encrypted text does not match the original and is a string.
+Conclusion: Confirms the encryption function works correctly.
+test_decrypt_private_key
+2.
+Description: Tests the decrypt_private_key function.
+Checks: Ensures the decrypted text matches the original.
+Conclusion: Confirms the decryption function works correctly.
+test_encryption_key
+3.
+Description: Tests that the encryption key is set.
+Checks: Ensures the ENCRYPTION_KEY environment variable is not None.
+Conclusion: Confirms the encryption key is properly set.
