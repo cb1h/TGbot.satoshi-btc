@@ -1,22 +1,23 @@
 # TGbot-for-btc-transaction.satoshi
 
-Bot uses API from blockcypher.com  
-Docs: https://www.blockcypher.com/dev/#introduction
+This repository includes a Telegram bot for managing Bitcoin transactions using BlockCypher's API. **Tests have been added** to improve bot reliability and functionality.
 
-You will need a token from blockcypher.com (just register, it's free).
-You will need a token from your Telegram Bot (use BotFather to create bots).
-You will need to create an encryption key. Use the file `create_key.py` to create this key.
+## Getting Started
 
-This is a Telegram bot for managing Bitcoin transactions. The bot allows users to generate new Bitcoin addresses, check balances, and send cryptocurrency.
+To use this bot, you'll need:
+1. An **encryption key**: Generate it by running the `create_key.py` file.
+2. **Tokens**:
+   - A Telegram Bot token: Create a bot through BotFather to obtain this token.
+   - A BlockCypher API token: Register at [blockcypher.com](https://www.blockcypher.com/) (it's free) and retrieve your API token.
 
 ## Features
 
-- **Start**: Start working with the bot.
-- **Check Balance**: Check the balance of a specified Bitcoin address.
-- **Generate Address**: Generate a new Bitcoin address.
-- **Send Cryptocurrency**: Send cryptocurrency from one address to another.
+- **Start**: Begin interacting with the bot.
+- **Check Balance**: Retrieve the balance of a specified Bitcoin address.
+- **Generate Address**: Create a new Bitcoin address.
+- **Send Cryptocurrency**: Transfer cryptocurrency from one address to another.
 
-## Requirements
+## Requirements (for BOT, not for tests)
 
 - Python 3.7+
 - `python-telegram-bot`
@@ -48,7 +49,7 @@ This is a Telegram bot for managing Bitcoin transactions. The bot allows users t
     pip install -r requirements.txt
     ```
 
-4. Create a `.env` file in the root directory of the project and add your tokens:
+4. Set up your `.env` file in the project root directory and add the following tokens:
 
     ```env
     TELEGRAM_BOT_TOKEN=your_telegram_bot_token
@@ -64,7 +65,7 @@ This is a Telegram bot for managing Bitcoin transactions. The bot allows users t
     python main.py
     ```
 
-2. Interact with the bot using the following commands:
+2. Use these commands to interact with the bot:
     - `/start` - Start working with the bot.
     - `/balance <address>` - Check the balance of a specified Bitcoin address.
     - `/generate_address` - Generate a new Bitcoin address.
@@ -72,9 +73,12 @@ This is a Telegram bot for managing Bitcoin transactions. The bot allows users t
 
 ## Test Mode
 
-For Test Mode of the bot, use `bcy/test` in API URLs instead of `btc/main` and check https://www.blockcypher.com/dev/#testing.  
-With tests, you can fund your test address and send money to another test address, check balances.
+For test transactions, use `bcy/test` in API URLs instead of `btc/main`. Check [BlockCypher's documentation on testing](https://www.blockcypher.com/dev/#testing) for more details. In test mode, you can fund test addresses, send transactions, and check balances.
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for more details.
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
+Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes. 
