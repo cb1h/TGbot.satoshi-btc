@@ -34,15 +34,15 @@ async def test_start_command(bot, update, context):
 async def test_check_balance_command(bot, update, context):
     context.args = ['test_address']
     await check_balance(update, context)
-    assert update.message.reply_text.called
+    update.message.reply_text.assert_called()
 
 @pytest.mark.asyncio
 async def test_generate_address_command(bot, update, context):
     await generate_address(update, context)
-    assert update.message.reply_text.called
+    update.message.reply_text.assert_called()
 
 @pytest.mark.asyncio
 async def test_send_crypto_command(bot, update, context):
     context.args = ['from_address', 'to_address', '1000']
     await send_crypto(update, context)
-    assert update.message.reply_text.called
+    update.message.reply_text.assert_called()
