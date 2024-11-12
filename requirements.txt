@@ -6,3 +6,4 @@ ecdsa
 nest_asyncio
 pytest
 mock
+pytest-asyncio
