@@ -5,3 +5,4 @@ cryptography
 ecdsa
 nest_asyncio
 pytest
+mock
