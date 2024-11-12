@@ -22,7 +22,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install -r [requirements.txt](http://_vscodecontentref_/#%7B%22uri%22%3A%7B%22%24mid%22%3A1%2C%22fsPath%22%3A%22%2FUsers%2Fcbih%2FSatoshibot%2FTGbot-for-btc-transaction.satoshi%2Frequirements.txt%22%2C%22path%22%3A%22%2FUsers%2Fcbih%2FSatoshibot%2FTGbot-for-btc-transaction.satoshi%2Frequirements.txt%22%2C%22scheme%22%3A%22file%22%7D%7D)
 
     - name: Run tests
       env:

@@ -1,6 +1,0 @@
-python-dotenv
-python-telegram-bot
-cryptography
-ecdsa
-aiohttp
-pytest
