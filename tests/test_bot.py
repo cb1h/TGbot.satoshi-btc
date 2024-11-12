@@ -1,14 +1,13 @@
 import os
-import json
 import pytest
 from telegram import Update, Bot
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from telegram.ext import ContextTypes
 from main import start, check_balance, generate_address, send_crypto
 
-# Mock environment variables
-os.environ['TELEGRAM_BOT_TOKEN'] = 'test_token'
-os.environ['BLOCKCYPHER_API_TOKEN'] = 'test_blockcypher_token'
-os.environ['ENCRYPTION_KEY'] = 'test_encryption_key'
+# Mock environment
+os.environ['TELEGRAM_BOT_TOKEN'] = os.getenv('TELEGRAM_BOT_TOKEN', 'test_token')
+os.environ['BLOCKCYPHER_API_TOKEN'] = os.getenv('BLOCKCYPHER_API_TOKEN', 'test_blockcypher_token')
+os.environ['ENCRYPTION_KEY'] = os.getenv('ENCRYPTION_KEY', 'test_encryption_key')
 
 @pytest.fixture
 def bot():

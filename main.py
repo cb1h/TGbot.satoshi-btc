@@ -23,6 +23,9 @@ token = os.getenv('TELEGRAM_BOT_TOKEN')
 blockcypher_token = os.getenv('BLOCKCYPHER_API_TOKEN')
 encryption_key = os.getenv('ENCRYPTION_KEY')
 
+if not token or not blockcypher_token or not encryption_key:
+    raise ValueError("One or more environment variables are not set")
+
 # Initialize encryption
 cipher_suite = Fernet(encryption_key.encode())
 

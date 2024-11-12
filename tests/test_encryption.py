@@ -3,7 +3,7 @@ import pytest
 from main import encrypt_private_key, decrypt_private_key
 
 # Mock environment variable
-os.environ['ENCRYPTION_KEY'] = 'test_encryption_key'
+os.environ['ENCRYPTION_KEY'] = os.getenv('ENCRYPTION_KEY', 'test_encryption_key')
 ENCRYPTION_KEY = os.getenv("ENCRYPTION_KEY")
 
 def test_encrypt_private_key():
