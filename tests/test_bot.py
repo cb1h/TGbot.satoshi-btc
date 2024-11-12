@@ -1,7 +1,7 @@
 import os
 import pytest
-from unittest.mock import AsyncMock, patch
-from telegram import Update, Bot
+from unittest.mock import AsyncMock, patch, MagicMock
+from telegram import Update, Bot, Message
 from telegram.ext import ContextTypes
 from main import start, check_balance, generate_address, send_crypto
 
@@ -16,7 +16,9 @@ def bot():
 
 @pytest.fixture
 def update():
-    return Update(update_id=1, message=AsyncMock())
+    message = MagicMock(spec=Message)
+    update = Update(update_id=1, message=message)
+    return update
 
 @pytest.fixture
 def context():
